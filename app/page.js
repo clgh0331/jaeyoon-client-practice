@@ -1,95 +1,62 @@
+'use client'
 import Image from 'next/image'
 import styles from './page.module.css'
+import {useState} from "react";
+import Link from "next/link";
 
 export default function Home() {
+
+    const [text, setText] = useState("");
+    const [data, setData] = useState([]);
+
+  const postName = () => {
+    fetch('http://localhost:8080/names', {
+      method: "POST",
+      body: JSON.stringify({
+          name: text
+      })
+    })
+    .then((response) => response.json())
+    .then((responseJSON) => {
+      console.log(responseJSON);
+    });
+
+  }
+
+
+  const getNames = () => {
+    fetch('http://localhost:8080/names', {
+      method: "GET"
+    })
+    .then((data) => data.json())
+    .then((responseJSON) => {
+        console.log("DATA FETCHED")
+        setData(responseJSON.data)
+    })
+    .catch((e) => console.log(e))
+    .finally(() => console.log("종료"))
+
+      console.log("HELLO");
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main style={{display: "flex", flexDirection: 'column', padding: 20}}>
+        <div style={{display: 'flex', flexDirection: 'row'}}>
+            <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                style={{backgroundColor: "white", color: "black"}}/>
+            <button style={{width: 50, height:30, backgroundColor: 'white', color: 'black'}} onClick={postName}>보내기</button>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+        <button style={{width: 100, height:30, backgroundColor: 'white', color: 'black'}} onClick={getNames}>데이터 가져오기</button>
+        {
+            data?.map(item =>
+                <Link href={`/${item.id}`}>
+                    <div style={{padding: 10}}>
+                        {item.id} : {item.name}
+                    </div>
+                </Link>)
+        }
     </main>
   )
 }
